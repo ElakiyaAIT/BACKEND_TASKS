@@ -8,6 +8,7 @@ import { ProductsModule } from './products/products.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
     AuthModule,
     ProfileModule,
     ProductsModule,
+    MailModule,
      ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
       serveRoot: '/uploads',
