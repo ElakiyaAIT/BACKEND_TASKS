@@ -12,6 +12,9 @@ export class Product extends Document {
     @Prop({required:true})
     price: number;
 
+    @Prop({required:true, min:0})
+    stock: number;
+
     @Prop({type:[String], default:[]})
     images:string[];
 }

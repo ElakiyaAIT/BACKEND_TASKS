@@ -10,6 +10,7 @@ import {
   BadRequestException,
   UploadedFiles,
   InternalServerErrorException,
+  Query,
 } from '@nestjs/common';
 import {  FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -54,7 +55,9 @@ export class ProductsController {
     @UploadedFiles() files: Express.Multer.File[],
   ) {
     try{
-
+      if(!body.stock){
+        throw new BadRequestException('Stock field is required');
+      }
     if (!files || files.length === 0) {
       throw new BadRequestException('At least one image is required');
     }
@@ -66,6 +69,26 @@ export class ProductsController {
          throw error instanceof BadRequestException
          ? error: new InternalServerErrorException('Product creation failed');
     }
+  }
+
+  //FILTER
+   @Get('filter')
+  filterProducts(
+    @Query('name') name?: string,
+    @Query('fromDate') fromDate?: string,
+    @Query('toDate') toDate?: string,
+    @Query('inStock') inStock?: string,
+    @Query('sortBy') sortBy?: string,
+    @Query('order') order?: 'asc' | 'desc',
+  ) {
+    return this.productsService.filterProducts({
+      name,
+      fromDate,
+      toDate,
+      inStock,
+      sortBy,
+      order,
+    });
   }
   // READ ALL
   @Get()
@@ -89,6 +112,7 @@ export class ProductsController {
     
   }
 
+  
   // UPDATE
   @Put(':id')
 @UseInterceptors(

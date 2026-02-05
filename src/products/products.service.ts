@@ -8,7 +8,7 @@ import { Model } from 'mongoose';
 import { Product } from './schemas/product.schema';
 import * as fs from 'fs';
 import * as path from 'path';
-import { PRODUCT_MESSAGES } from 'src/common/constants/product.constants';
+import { PRODUCT_MESSAGES, PRODUCT_SORT_CONSTANTS } from 'src/common/constants/product.constants';
 
 @Injectable()
 export class ProductsService {
@@ -21,6 +21,7 @@ export class ProductsService {
         try {
             return await this.productModel.create({
                 ...data,
+                stock:Number(data.stock),
                 images,
             });
         } catch (error) {
@@ -55,6 +56,9 @@ export class ProductsService {
         try {
             const updateData: any = { ...body };
 
+            if (body.stock !== undefined) {
+                updateData.stock = Number(body.stock);
+            }
             if (images.length > 0) {
                 updateData.$push = { images: { $each: images } };
             }
@@ -117,4 +121,64 @@ export class ProductsService {
         }
 
     }
+
+     async filterProducts(filters: {
+    name?: string;
+    fromDate?: string;
+    toDate?: string;
+    inStock?: string;
+    sortBy?: string;
+    order?: 'asc' | 'desc';
+  }) {
+    try{
+const query: any = {};
+
+    // 🔍 Filter by name (case-insensitive)
+    if (filters.name) {
+      query.name = {
+        $regex: filters.name,
+        $options: 'i',
+      };
+    }
+
+    // 📅 Filter by created date
+    if (filters.fromDate || filters.toDate) {
+      query.createdAt = {};
+
+      if (filters.fromDate) {
+        query.createdAt.$gte = new Date(filters.fromDate);
+      }
+
+      if (filters.toDate) {
+        query.createdAt.$lte = new Date(filters.toDate);
+      }
+    }
+
+    // 📦 Filter by stock availability
+    if (filters.inStock !== undefined) {
+      if (filters.inStock === 'true') {
+        query.stock = { $gt: 0 };
+      }
+
+      if (filters.inStock === 'false') {
+        query.stock = { $lte: 0 };
+      }
+    }
+     let sort: any = { createdAt: -1 }; // default
+
+    if (
+      filters.sortBy &&
+      PRODUCT_SORT_CONSTANTS.ALLOWED_SORT_FIELDS.includes(filters.sortBy)
+    ) {
+      sort = {
+        [filters.sortBy]: filters.order === 'asc' ? 1 : -1,
+      };
+    }
+
+    return this.productModel.find(query).sort(sort);
+  } catch(error){
+    throw new InternalServerErrorException(PRODUCT_MESSAGES.FETCH_FAILED);
+  }
+    }
+    
 }

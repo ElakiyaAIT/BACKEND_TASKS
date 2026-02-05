@@ -12,3 +12,11 @@ export const PRODUCT_MESSAGES = {
   DELETE_SUCCESS: 'Product deleted successfully',
   IMAGE_DELETE_SUCCESS: 'Image removed successfully',
 };
+
+export const PRODUCT_SORT_CONSTANTS = {
+  ALLOWED_SORT_FIELDS: ['name', 'price', 'createdAt', 'stock'],
+  SORT_ORDER: {
+    ASC: 'asc',
+    DESC: 'desc',
+  },
+};
