@@ -2,20 +2,26 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config/dist/config.service';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { AUTH_CONSTANTS } from 'src/common/constants/auth.constants';
 import { ERROR_MESSAGES } from 'src/common/constants/error-messages';
+
+interface JwtPayload {
+  sub: string;
+  email: string;
+  iat?: number;
+  exp?: number;
+}
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private configService: ConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: configService.getOrThrow<string>('jwt.secret'), 
+      secretOrKey: configService.getOrThrow<string>('jwt.secret'),
     });
   }
 
-  async validate(payload: any) {
-  try {
+  validate(payload: JwtPayload) {
+    try {
       // payload comes from decoded JWT
       if (!payload || !payload.sub) {
         throw new UnauthorizedException(ERROR_MESSAGES.INVALID_TOKEN_PAYLOAD);
@@ -26,7 +32,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         userId: payload.sub,
         email: payload.email,
       };
-    } catch (error) {
+    } catch {
       throw new UnauthorizedException(ERROR_MESSAGES.INVALID_TOKEN);
     }
   }

@@ -16,7 +16,7 @@ import { MailCronService } from '../mail/mail.cron.service';
     }),
   ],
   controllers: [MailController],
-  providers: [MailService, MailProcessor,MailCronService],
-  exports: [MailService], 
+  providers: [MailService, MailProcessor, MailCronService],
+  exports: [MailService],
 })
 export class MailModule {}

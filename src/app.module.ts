@@ -15,7 +15,7 @@ import { BullModule } from '@nestjs/bull';
 import { ConfigModule } from '@nestjs/config/dist/config.module';
 import { ConfigService } from '@nestjs/config';
 import { UsersModule } from './modules/users.module';
-import * as yaml from 'js-yaml';
+import { load } from 'js-yaml';
 import * as fs from 'fs';
 
 function loadConfig() {
@@ -25,30 +25,28 @@ function loadConfig() {
     env === 'production'
       ? 'prod.yaml'
       : env === 'staging'
-      ? 'stage.yaml'
-      : 'dev.yaml';
+        ? 'stage.yaml'
+        : 'dev.yaml';
 
   const filePath = join(process.cwd(), 'config', fileName);
 
-  return yaml.load(
-    fs.readFileSync(filePath, 'utf8'),
-  ) as Record<string, any>;
+  return load(fs.readFileSync(filePath, 'utf8')) as Record<string, unknown>;
 }
 
 @Module({
   imports: [
-      MongooseModule.forRootAsync({
-  inject: [ConfigService],
-  useFactory: (config: ConfigService) => ({
-    uri: config.getOrThrow<string>('database.mongoUri'),
-  }),
-}),
+    MongooseModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        uri: config.getOrThrow<string>('database.mongoUri'),
+      }),
+    }),
     AuthModule,
     ProfileModule,
     ProductsModule,
     MailModule,
     UsersModule,
-     ServeStaticModule.forRoot({
+    ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
       serveRoot: '/uploads',
     }),
@@ -63,7 +61,7 @@ function loadConfig() {
     ConfigModule.forRoot({
       isGlobal: true,
       load: [loadConfig],
-    })
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],

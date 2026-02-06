@@ -1,14 +1,18 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import * as nodemailer from 'nodemailer';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import nodemailer, { Transporter } from 'nodemailer';
+import type { SentMessageInfo, SendMailOptions } from 'nodemailer';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as handlebars from 'handlebars';
-import { Transporter } from 'nodemailer';
 import { ConfigService } from '@nestjs/config/dist/config.service';
 
 @Injectable()
 export class MailService {
-  private transporter:Transporter;
+  private transporter: Transporter;
 
   constructor(private readonly config: ConfigService) {
     this.transporter = nodemailer.createTransport({
@@ -27,8 +31,8 @@ export class MailService {
     subject: string,
     templateName: string,
     context: Record<string, unknown>,
-    attachments: nodemailer.Attachment[] = [],
-  ) {
+    attachments: SendMailOptions['attachments'] = [],
+  ): Promise<SentMessageInfo> {
     try {
       const layoutPath = path.join(
         process.cwd(),
@@ -38,6 +42,17 @@ export class MailService {
         'layouts',
         'main.hbs',
       );
+      console.log({
+        to,
+        subject,
+        templateName,
+        context,
+        attachments,
+      });
+
+      if (!templateName) {
+        throw new BadRequestException('Template name is required');
+      }
 
       const layoutSource = fs.readFileSync(layoutPath, 'utf-8');
       const layoutTemplate = handlebars.compile(layoutSource);
@@ -53,18 +68,21 @@ export class MailService {
       const templateSource = fs.readFileSync(templatePath, 'utf-8');
       const contentTemplate = handlebars.compile(templateSource);
 
-      const body=contentTemplate(context);
+      const body = contentTemplate(context);
       const html = layoutTemplate({ body });
 
       return await this.transporter.sendMail({
-        from: process.env.MAIL_FROM,
+        from: this.config.getOrThrow<string>('mail.from'),
         to,
         subject,
         html,
         attachments,
       });
     } catch (error) {
-      throw new InternalServerErrorException('Failed to send email');
+      console.error('MAIL ERROR:', error);
+      throw new InternalServerErrorException(
+        error instanceof Error ? error.message : 'Failed to send email',
+      );
     }
   }
 }

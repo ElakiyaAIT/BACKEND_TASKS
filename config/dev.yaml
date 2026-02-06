@@ -12,6 +12,7 @@ jwt:
 mail:
   host: sandbox.smtp.mailtrap.io
   port: 2525
-  user: dev_user
-  pass: dev_pass
+  secure: false
+  user: fe690ab25ca62c
+  pass: f23edadc970bb1
   from: no-reply@dev.com
