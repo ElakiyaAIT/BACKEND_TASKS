@@ -1,0 +1,17 @@
+app:
+  env: production
+  port: 80
+
+database:
+  mongoUri: mongodb://prod-db:27017/jwt_prod
+
+jwt:
+  secret: prod_jwt_secret
+  expiresIn: 86400
+
+mail:
+  host: smtp.prod.com
+  port: 587
+  user: prod_user
+  pass: prod_pass
+  from: no-reply@prod.com

@@ -1,6 +1,6 @@
 import { Controller, Get, UseGuards, Request, InternalServerErrorException } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport/dist/auth.guard";
-import { ProfileService } from "./profile.service";
+import { ProfileService } from "../services/profile.service";
 import { ERROR_MESSAGES } from "src/common/constants/error-messages";
 
 @Controller('profile')

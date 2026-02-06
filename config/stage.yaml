@@ -1,0 +1,17 @@
+app:
+  env: staging
+  port: 4000
+
+database:
+  mongoUri: mongodb://staging-db:27017/jwt_stage
+
+jwt:
+  secret: stage_jwt_secret
+  expiresIn: 36000
+
+mail:
+  host: smtp.stage.com
+  port: 587
+  user: stage_user
+  pass: stage_pass
+  from: no-reply@stage.com

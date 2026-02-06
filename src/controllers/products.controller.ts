@@ -15,7 +15,7 @@ import {
 import {  FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-import { ProductsService } from './products.service';
+import { ProductsService } from '../services/products.service';
 import { FILE_CONSTANTS } from 'src/common/constants/file.constants';
 
 @Controller('products')

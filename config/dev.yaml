@@ -1,0 +1,17 @@
+app:
+  env: development
+  port: 3000
+
+database:
+  mongoUri: mongodb://localhost:27017/jwt_dev
+
+jwt:
+  secret: dev_jwt_secret
+  expiresIn: 86400
+
+mail:
+  host: sandbox.smtp.mailtrap.io
+  port: 2525
+  user: dev_user
+  pass: dev_pass
+  from: no-reply@dev.com

@@ -3,19 +3,21 @@ import * as nodemailer from 'nodemailer';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as handlebars from 'handlebars';
+import { Transporter } from 'nodemailer';
+import { ConfigService } from '@nestjs/config/dist/config.service';
 
 @Injectable()
 export class MailService {
-  private transporter;
+  private transporter:Transporter;
 
-  constructor() {
+  constructor(private readonly config: ConfigService) {
     this.transporter = nodemailer.createTransport({
-      host: process.env.MAIL_HOST,
-      port: Number(process.env.MAIL_PORT),
-      secure: false,
+      host: this.config.getOrThrow<string>('mail.host'),
+      port: this.config.getOrThrow<number>('mail.port'),
+      secure: this.config.get<boolean>('mail.secure') || false,
       auth: {
-        user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASS,
+        user: this.config.getOrThrow<string>('mail.user'),
+        pass: this.config.getOrThrow<string>('mail.pass'),
       },
     });
   }
@@ -24,8 +26,8 @@ export class MailService {
     to: string,
     subject: string,
     templateName: string,
-    context: any,
-    attachments: any[] = [],
+    context: Record<string, unknown>,
+    attachments: nodemailer.Attachment[] = [],
   ) {
     try {
       const layoutPath = path.join(
