@@ -50,26 +50,33 @@ export class ProductsController {
     }),
   )
   async create(
-    @Body() body: CreateProductDto,
-    @UploadedFiles() files: Express.Multer.File[],
-  ) {
-    try {
-      if (!body.stock) {
-        throw new BadRequestException('Stock field is required');
-      }
-      if (!files || files.length === 0) {
-        throw new BadRequestException('At least one image is required');
-      }
+  @Body() body: CreateProductDto,
+  @UploadedFiles() files: Express.Multer.File[],
+) {
+  try {
+    const stock = Number(body.stock);
 
-      const filenames = files.map((file) => file.filename);
-
-      return await this.productsService.create(body, filenames);
-    } catch (error) {
-      throw error instanceof BadRequestException
-        ? error
-        : new InternalServerErrorException('Product creation failed');
+    if (!Number.isFinite(stock)) {
+      throw new BadRequestException('Stock must be a valid number');
     }
+
+    if (!files || files.length === 0) {
+      throw new BadRequestException('At least one image is required');
+    }
+
+    const filenames = files.map((file) => file.filename);
+
+    return await this.productsService.create(
+      { ...body, stock },
+      filenames,
+    );
+  } catch (error) {
+    throw error instanceof BadRequestException
+      ? error
+      : new InternalServerErrorException('Product creation failed');
   }
+}
+
 
   //FILTER
   @Get('filter')

@@ -3,7 +3,10 @@ app:
   port: 4000
 
 database:
-  mongoUri: mongodb://staging-db:27017/jwt_stage
+  mongoUri: mongodb://localhost:27017/jwt_stage
+
+
+
 
 jwt:
   secret: stage_jwt_secret

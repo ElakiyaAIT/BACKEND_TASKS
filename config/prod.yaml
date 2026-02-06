@@ -3,7 +3,7 @@ app:
   port: 80
 
 database:
-  mongoUri: mongodb://prod-db:27017/jwt_prod
+  mongoUri: mongodb+srv://elakiyavarshiniait_db_user:1234@mongoqueries.swdue9k.mongodb.net/?appName=MongoQueries
 
 jwt:
   secret: prod_jwt_secret
